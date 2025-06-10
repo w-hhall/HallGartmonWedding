@@ -138,16 +138,16 @@ With love and excitement,
         
         <div class="contact-grid">
             <div class="contact-card">
-                <div class="contact-name">William</div>
-                <div class="contact-phone">
-                    <a href="tel:+18034149580">(803) 414-9580</a>
-                </div>
-            </div>
-            <div class="contact-card">
-                <div class="contact-name">India</div>
-                <div class="contact-phone">
-                    <a href="tel:+18034453200">(803) 445-3200</a>
-                </div>
+                <form name="contact" method="POST" netlify netlify-honeypot="bot-field">
+                    <input type="hidden" name="form-name" value="contact" />
+                    <p style="display: none;">
+                        <input name="bot-field" />
+                    </p>
+                    <input type="text" name="name" required />
+                    <input type="email" name="email" required />
+                    <textarea name="message" required></textarea>
+                    <button type="submit">Send</button>
+                </form>
             </div>
         </div>
         
