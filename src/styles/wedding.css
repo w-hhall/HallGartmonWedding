@@ -125,13 +125,11 @@ body {
 /* Section Styles */
 .section {
     margin-bottom: 80px;
-    padding: 40px 0;
 }
 
 @media (min-width: 1200px) {
     .section {
         margin-bottom: 100px;
-        padding: 60px 0;
     }
 }
 
@@ -281,19 +279,6 @@ body {
         padding: 40px 50px;
         margin-bottom: 50px;
     }
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -62px;
-    top: 35px;
-    width: 16px;
-    height: 16px;
-    background: #667eea;
-    border-radius: 50%;
-    border: 4px solid white;
-    box-shadow: 0 0 0 3px #667eea;
 }
 
 @media (min-width: 1200px) {
