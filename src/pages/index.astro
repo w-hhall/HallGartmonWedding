@@ -138,15 +138,30 @@ With love and excitement,
         
         <div class="contact-grid">
             <div class="contact-card">
-                <form name="contact" method="POST" netlify netlify-honeypot="bot-field">
+                <form name="contact" method="POST" netlify netlify-honeypot="bot-field" class="contact-form">
                     <input type="hidden" name="form-name" value="contact" />
+                    
+                    <!-- Honeypot field - hidden from users but visible to bots -->
                     <p style="display: none;">
-                        <input name="bot-field" />
+                        <label>Don't fill this out if you're human: <input name="bot-field" /></label>
                     </p>
-                    <input type="text" name="name" required />
-                    <input type="email" name="email" required />
-                    <textarea name="message" required></textarea>
-                    <button type="submit">Send</button>
+                    
+                    <div class="form-group">
+                        <label for="name" class="form-label">Name <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" class="form-input" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" class="form-input" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message" class="form-label">Message <span class="required">*</span></label>
+                        <textarea id="message" name="message" class="form-textarea" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-submit">Send Message</button>
                 </form>
             </div>
         </div>
