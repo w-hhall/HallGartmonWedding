@@ -52,12 +52,23 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            height: 100vh; /* or your desired height */
             color: white;
             border-radius: 20px;
             margin-bottom: 40px;
             position: relative;
             overflow: hidden;
+        }
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: -0.02em;
+            }
+
+            .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 300;
+            margin: 1rem 0 2rem 0;
         }
 
         @media (min-width: 768px) {
@@ -76,18 +87,13 @@
         .hero::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: floating 6s ease-in-out infinite;
-        }
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.1));
+            }
 
-        @keyframes floating {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-20px, -20px) rotate(180deg); }
-        }
 
         .hero-content {
             position: relative;
