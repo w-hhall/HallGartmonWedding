@@ -2,6 +2,27 @@
 import Layout from '../layouts/WeddingLayout.astro';
 import ContextAlert from '../components/ContextAlert.astro';
 import Markdown from '../components/Markdown.astro';
+import Gallery from '../components/Gallery.astro';
+
+// Define your images
+const images = [
+  {
+    src: '../assets/hero_2.jpg',
+    alt: 'Beautiful landscape',
+    title: 'Mountain Vista'
+  },
+  {
+    src: '../assets/hero_3.jpg',
+    alt: 'City skyline',
+    title: 'Urban Sunset'
+  },
+  {
+    src: '../assets/hero_img.jpg',
+    alt: 'Ocean waves',
+    title: 'Coastal Beauty'
+  },
+  // Add more images...
+];
 
 const explainer = `
 # Wedding Invitation Email Template
@@ -233,7 +254,10 @@ With love and excitement,
                 </div>
             </div>
         </section>
-
+        <section class="section">
+            <h2 class="section-title">Engagement Gallery</h2>
+            <Gallery images={images} />
+        </section>
         <footer class="footer">
             <p class="footer-main">
                 We cannot wait to celebrate with you and create beautiful memories together!
