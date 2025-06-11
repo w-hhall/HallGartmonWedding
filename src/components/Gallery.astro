@@ -1,35 +1,78 @@
 ---
-// Gallery.astro
+// Gallery.astro - Reusable gallery component
+import { Image } from 'astro:assets';
+
 export interface Props {
-  images: Array<{
-    src: string;
-    alt: string;
-    title?: string;
-  }>;
+  assetsPath?: string;
   columns?: number;
+  imageWidth?: number;
+  imageHeight?: number;
 }
 
-const { images, columns = 3 } = Astro.props;
+const { 
+  assetsPath = '../assets', 
+  columns = 3, 
+  imageWidth = 300, 
+  imageHeight = 200 
+} = Astro.props;
+
+// Create glob pattern based on the assetsPath
+const globPattern = `${assetsPath}/*.{jpeg,jpg,png,gif,webp}`;
+
+// Import all images from the specified assets path
+const imageModules = import.meta.glob(globPattern, { 
+  eager: true,
+  import: 'default' 
+});
+
+// Convert to array format with metadata
+const images = Object.entries(imageModules).map(([path, module]) => {
+  // Extract filename from path
+  const filename = path.split('/').pop()?.split('.')[0] || '';
+  
+  return {
+    src: module,
+    alt: filename.replace(/[_-]/g, ' '), // Convert underscores/hyphens to spaces
+    title: filename
+      .split(/[_-]/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' '),
+    filename: filename
+  };
+});
+
+// Sort images by filename for consistent ordering
+images.sort((a, b) => a.filename.localeCompare(b.filename));
 ---
 
-<div class="gallery">
-  {images.map((image) => (
-    <div class="gallery-item">
-      <img 
+<div class="gallery" style={`--columns: ${columns}`}>
+  {images.map((image, index) => (
+    <div class="gallery-item" data-index={index}>
+      <Image 
         src={image.src} 
         alt={image.alt}
-        title={image.title}
+        width={imageWidth}
+        height={imageHeight}
         loading="lazy"
+        class="gallery-image"
       />
-      {image.title && <div class="gallery-caption">{image.title}</div>}
+      <div class="gallery-overlay">
+        <div class="gallery-title">{image.title}</div>
+      </div>
     </div>
   ))}
 </div>
 
+{images.length === 0 && (
+  <div class="no-images">
+    <p>No images found in the specified path: {assetsPath}</p>
+  </div>
+)}
+
 <style>
   .gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 1rem;
     padding: 1rem;
   }
@@ -37,36 +80,87 @@ const { images, columns = 3 } = Astro.props;
   .gallery-item {
     position: relative;
     overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    cursor: pointer;
   }
 
   .gallery-item:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   }
 
-  .gallery-item img {
+  .gallery-image {
     width: 100%;
     height: 250px;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s ease;
   }
 
-  .gallery-caption {
+  .gallery-item:hover .gallery-image {
+    transform: scale(1.05);
+  }
+
+  .gallery-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      transparent 100%
+    );
     color: white;
-    padding: 1rem;
-    font-size: 0.9rem;
+    padding: 1.5rem 1rem 1rem;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
   }
 
+  .gallery-item:hover .gallery-overlay {
+    transform: translateY(0);
+  }
+
+  .gallery-title {
+    font-size: 1rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .no-images {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+  }
+
+  /* Responsive adjustments */
   @media (max-width: 768px) {
     .gallery {
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 0.75rem;
+      padding: 0.75rem;
+    }
+
+    .gallery-image {
+      height: 200px;
+    }
+
+    .gallery-overlay {
+      padding: 1rem 0.75rem 0.75rem;
+    }
+
+    .gallery-title {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .gallery {
+      grid-template-columns: 1fr;
       gap: 0.5rem;
       padding: 0.5rem;
     }
