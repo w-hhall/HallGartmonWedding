@@ -3,24 +3,19 @@
 import { Image } from 'astro:assets';
 
 export interface Props {
-  assetsPath?: string;
   columns?: number;
   imageWidth?: number;
   imageHeight?: number;
 }
 
 const { 
-  assetsPath = '../assets', 
   columns = 3, 
   imageWidth = 300, 
   imageHeight = 200 
 } = Astro.props;
 
-// Create glob pattern based on the assetsPath
-const globPattern = `${assetsPath}/*.{jpeg,jpg,png,gif,webp}`;
-
-// Import all images from the specified assets path
-const imageModules = import.meta.glob(globPattern, { 
+// Import all images from assets folder (must be literal string)
+const imageModules = import.meta.glob('../assets/*.{jpeg,jpg,png,gif,webp}', { 
   eager: true,
   import: 'default' 
 });
@@ -65,7 +60,7 @@ images.sort((a, b) => a.filename.localeCompare(b.filename));
 
 {images.length === 0 && (
   <div class="no-images">
-    <p>No images found in the specified path: {assetsPath}</p>
+    <p>No images found in ../assets/</p>
   </div>
 )}
 
