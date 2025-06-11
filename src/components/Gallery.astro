@@ -1,26 +1,18 @@
-
+---
+// MasonryGallery.astro - Preserves natural aspect ratios
 import { Image } from 'astro:assets';
 
 export interface Props {
   columns?: number;
-  imageSize?: 'small' | 'medium' | 'large';
-  cropStyle?: 'cover' | 'contain' | 'fill';
+  imageWidth?: number;
+  gap?: string;
 }
 
 const { 
   columns = 3, 
-  imageSize = 'medium',
-  cropStyle = 'cover'
+  imageWidth = 400,
+  gap = '1rem'
 } = Astro.props;
-
-// Size configurations
-const sizeConfig = {
-  small: { width: 350, height: 250 },
-  medium: { width: 500, height: 350 },
-  large: { width: 700, height: 500 }
-};
-
-const currentSize = sizeConfig[imageSize];
 
 // Import all images from assets folder
 const imageModules = import.meta.glob('../assets/*.{jpeg,jpg,png,gif,webp}', { 
@@ -43,28 +35,24 @@ const images = Object.entries(imageModules).map(([path, module]) => {
   };
 });
 
+// Sort images by filename for consistent ordering
 images.sort((a, b) => a.filename.localeCompare(b.filename));
 ---
 
-<div class="hq-gallery" style={`--columns: ${columns}; --crop-style: ${cropStyle};`}>
+<div class="masonry-gallery" style={`--columns: ${columns}; --gap: ${gap};`}>
   {images.map((image, index) => (
-    <div class="hq-item" data-index={index}>
-      <div class="image-container">
-        <Image 
-          src={image.src} 
-          alt={image.alt}
-          width={currentSize.width}
-          height={currentSize.height}
-          loading="lazy"
-          class="hq-image"
-          quality={95}
-          format="webp"
-        />
-        <div class="image-backdrop"></div>
-        <div class="image-info">
-          <h3 class="image-title">{image.title}</h3>
-          <p class="image-filename">{image.filename}</p>
-        </div>
+    <div class="masonry-item" data-index={index}>
+      <Image 
+        src={image.src} 
+        alt={image.alt}
+        width={imageWidth}
+        loading="lazy"
+        class="masonry-image"
+        quality={90}
+        format="webp"
+      />
+      <div class="image-overlay">
+        <div class="image-title">{image.title}</div>
       </div>
     </div>
   ))}
@@ -77,171 +65,110 @@ images.sort((a, b) => a.filename.localeCompare(b.filename));
 )}
 
 <style>
-  .hq-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
-    gap: 1.5rem;
-    padding: 1.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
+  .masonry-gallery {
+    columns: var(--columns);
+    column-gap: var(--gap);
+    padding: var(--gap);
   }
 
-  .hq-item {
+  .masonry-item {
     position: relative;
-    border-radius: 16px;
+    break-inside: avoid;
+    margin-bottom: var(--gap);
+    border-radius: 12px;
     overflow: hidden;
-    background: #f8f9fa;
-    box-shadow: 
-      0 4px 6px rgba(0, 0, 0, 0.07),
-      0 1px 3px rgba(0, 0, 0, 0.06);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
     cursor: pointer;
   }
 
-  .hq-item:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 
-      0 20px 25px rgba(0, 0, 0, 0.15),
-      0 8px 10px rgba(0, 0, 0, 0.1);
+  .masonry-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
   }
 
-  .image-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .hq-image {
+  .masonry-image {
     width: 100%;
     height: auto;
-    min-height: 250px;
-    object-fit: var(--crop-style, cover);
-    object-position: center;
     display: block;
-    transition: all 0.4s ease;
+    transition: transform 0.3s ease;
   }
 
-  .hq-item:hover .hq-image {
-    transform: scale(1.05);
-    filter: brightness(1.1) contrast(1.05);
+  .masonry-item:hover .masonry-image {
+    transform: scale(1.02);
   }
 
-  .image-backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.1) 50%,
-      rgba(0, 0, 0, 0.3) 100%
-    );
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-
-  .hq-item:hover .image-backdrop {
-    opacity: 1;
-  }
-
-  .image-info {
+  .image-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     background: linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.9) 0%,
-      rgba(0, 0, 0, 0.7) 50%,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.3) 60%,
       transparent 100%
     );
     color: white;
-    padding: 2rem 1.5rem 1.5rem;
+    padding: 1.5rem 1rem 1rem;
     transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s ease;
   }
 
-  .hq-item:hover .image-info {
+  .masonry-item:hover .image-overlay {
     transform: translateY(0);
   }
 
   .image-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    font-size: 1rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
     line-height: 1.3;
   }
 
-  .image-filename {
-    margin: 0;
-    font-size: 0.85rem;
-    opacity: 0.9;
-    font-family: 'Monaco', 'Menlo', monospace;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-  }
-
   .no-images {
-    grid-column: 1 / -1;
     text-align: center;
-    padding: 3rem;
+    padding: 2rem;
     color: #666;
     font-style: italic;
   }
 
   /* Responsive adjustments */
   @media (max-width: 1200px) {
-    .hq-gallery {
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.25rem;
-      padding: 1.25rem;
+    .masonry-gallery {
+      columns: calc(var(--columns) - 1);
     }
   }
 
   @media (max-width: 768px) {
-    .hq-gallery {
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-      padding: 1rem;
+    .masonry-gallery {
+      columns: 2;
+      column-gap: 0.75rem;
+      padding: 0.75rem;
     }
 
-    .hq-image {
-      min-height: 200px;
+    .masonry-item {
+      margin-bottom: 0.75rem;
     }
 
-    .image-info {
-      padding: 1.5rem 1rem 1rem;
+    .image-overlay {
+      padding: 1rem 0.75rem 0.75rem;
     }
 
     .image-title {
-      font-size: 1rem;
-    }
-
-    .image-filename {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
   }
 
   @media (max-width: 480px) {
-    .hq-gallery {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-      padding: 0.75rem;
+    .masonry-gallery {
+      columns: 1;
+      column-gap: 0.5rem;
+      padding: 0.5rem;
     }
 
-    .hq-item:hover {
-      transform: translateY(-4px) scale(1.01);
-    }
-  }
-
-  /* High-DPI displays */
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .hq-image {
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
+    .masonry-item {
+      margin-bottom: 0.5rem;
     }
   }
 </style>
